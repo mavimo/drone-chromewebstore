@@ -1,0 +1,19 @@
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/oauth2"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/urfave/cli"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/sirupsen/logrus"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/joho/godotenv"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/hidez8891/zip"

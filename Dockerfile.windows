@@ -1,0 +1,10 @@
+FROM microsoft/nanoserver:10.0.14393.1884
+
+LABEL maintainer="Marco Vito Moscaritolo <mavimo@gmail.com>" \
+    org.label-schema.name="Drone Chrome Webstore" \
+    org.label-schema.vendor="Marco Vito Moscaritolo" \
+    org.label-schema.schema-version="1.0"
+
+ADD drone-chromewebstore.exe c:\drone-chromewebstore.exe
+
+ENTRYPOINT [ "c:\\drone-chromewebstore.exe" ]

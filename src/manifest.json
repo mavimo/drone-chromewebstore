@@ -1,0 +1,20 @@
+{
+    "manifest_version": 2,
+
+    "name": "DroneBuildDemo",
+    "description": "Drone build demo",
+    "version": "1.0.6",
+
+    "background": {
+        "scripts": [
+            "demo/test.js"
+        ]
+    },
+
+    "permissions": [
+        "activeTab",
+        "tabs"
+    ],
+
+    "content_scripts": []
+}

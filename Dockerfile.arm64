@@ -1,0 +1,10 @@
+FROM plugins/base:multiarch
+
+LABEL maintainer="Marco Vito Moscaritolo <mavimo@gmail.com>" \
+    org.label-schema.name="Drone Chrome Webstore" \
+    org.label-schema.vendor="Marco Vito Moscaritolo" \
+    org.label-schema.schema-version="1.0"
+
+ADD release/linux/arm64/drone-chromewebstore /
+
+ENTRYPOINT ["/drone-chromewebstore"]

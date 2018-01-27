@@ -1,0 +1,125 @@
+workspace:
+  base: /go/src
+  path: github.com/mavimo/drone-chromewebstore
+
+clone:
+  git:
+    image: plugins/git
+    depth: 50
+    tags: true
+
+pipeline:
+  prepare:
+    image: instrumentisto/dep
+    commands:
+      - dep ensure
+
+  build_linux_amd64:
+    image: appleboy/golang-testing:1.9.2
+    pull: true
+    group: build
+    commands:
+      - make build_linux_amd64
+
+  build_linux_i386:
+    image: appleboy/golang-testing:1.9.2
+    pull: true
+    group: build
+    commands:
+      - make build_linux_i386
+
+  build_linux_arm64:
+    image: appleboy/golang-testing:1.9.2
+    pull: true
+    group: build
+    commands:
+      - make build_linux_arm64
+
+  build_linux_arm:
+    image: appleboy/golang-testing:1.9.2
+    pull: true
+    group: build
+    commands:
+      - make build_linux_arm
+
+  # codecov:
+  #   image: robertstettner/drone-codecov
+  #   secrets: [ codecov_token ]
+  #   files:
+  #     - coverage.txt
+  #   when:
+  #     event: [ push, pull_request ]
+
+  release:
+    image: appleboy/golang-testing:1.9.2
+    group: release
+    commands:
+      - make release
+    when:
+      event: [ tag ]
+
+  publish_linux_amd64:
+    image: plugins/docker
+    pull: true
+    secrets: [ docker_username, docker_password ]
+    group: release
+    repo: ${DRONE_REPO}
+    auto_tag: true
+    dockerfile: Dockerfile
+    when:
+      event: [ push, tag ]
+      local: false
+
+  publish_linux_i386:
+    image: plugins/docker:17.05
+    pull: true
+    secrets: [ docker_username, docker_password ]
+    group: release
+    repo: ${DRONE_REPO}
+    auto_tag: true
+    auto_tag_suffix: linux-i386
+    dockerfile: Dockerfile.i386
+    when:
+      event: [ push, tag ]
+      local: false
+
+  publish_linux_arm64:
+    image: plugins/docker:17.05
+    pull: true
+    secrets: [ docker_username, docker_password ]
+    group: release
+    repo: ${DRONE_REPO}
+    auto_tag: true
+    auto_tag_suffix: linux-arm64
+    dockerfile: Dockerfile.arm64
+    when:
+      event: [ push, tag ]
+      local: false
+
+  publish_linux_arm:
+    image: plugins/docker:17.05
+    pull: true
+    secrets: [ docker_username, docker_password ]
+    group: release
+    repo: ${DRONE_REPO}
+    auto_tag: true
+    auto_tag_suffix: linux-arm
+    dockerfile: Dockerfile.arm
+    when:
+      event: [ push, tag ]
+      local: false
+
+  github:
+    image: plugins/github-release
+    secrets: [ github_release_api_key ]
+    files:
+      - dist/release/*
+    when:
+      event: [ tag ]
+
+  notification:
+    image: plugins/slack
+    username: ci
+    secrets: [ slack_webhook ]
+    channel: dev
+    template: Drone Chrome Webstore build terminated with *{{#success build.status}}succes{{else}}failure{{/success}}*
