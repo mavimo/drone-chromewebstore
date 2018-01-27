@@ -20,10 +20,10 @@
   revision = "9fdf1707eda5a9c5e5d899319916e404bccd6ea2"
 
 [[projects]]
+  branch = "master"
   name = "github.com/joho/godotenv"
   packages = [".","autoload"]
-  revision = "a79fa1e548e2c689c241d10173efd51e5d689d5b"
-  version = "v1.2.0"
+  revision = "6bb08516677f8c8274c557fc801bee9ab564ab2c"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
@@ -32,10 +32,10 @@
   version = "v1.0.4"
 
 [[projects]]
+  branch = "master"
   name = "github.com/urfave/cli"
   packages = ["."]
-  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
-  version = "v1.20.0"
+  revision = "75104e932ac2ddb944a6ea19d9f9f26316ff1145"
 
 [[projects]]
   branch = "master"
@@ -76,6 +76,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ead60f9819fb998f69804d35d6c7f0cd6239a8bd3a21314b53acc336c5059b3d"
+  inputs-digest = "70e9ad9c4f652a3d60a86197eb3fdb04279ac865b533d05439706c689de5096f"
   solver-name = "gps-cdcl"
   solver-version = 1
