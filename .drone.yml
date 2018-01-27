@@ -9,10 +9,10 @@ clone:
     tags: true
 
 pipeline:
-  prepare:
-    image: instrumentisto/dep
-    commands:
-      - dep ensure
+  # prepare:
+  #   image: instrumentisto/dep
+  #   commands:
+  #     - dep ensure
 
   build_linux_amd64:
     image: appleboy/golang-testing:1.9.2
