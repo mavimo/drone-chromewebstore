@@ -107,5 +107,9 @@ func run(c *cli.Context) error {
 		},
 	}
 
-	return plugin.Exec()
+	if err := plugin.Exec(); err != nil {
+		return cli.NewExitError(err, 1)
+	}
+
+	return nil
 }
