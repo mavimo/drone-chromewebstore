@@ -18,7 +18,7 @@ var (
 func main() {
 	app := cli.NewApp()
 	app.Name = "Drone Chrome Webstore"
-	app.Usage = "Deploying Chrome plugins on webstore with drone CI to an existing plugin"
+	app.Usage = "Upload and publish application on Chrome Webstore with drone CI"
 	app.Copyright = "Copyright (c) 2018 Marco Vito Moscaritolo"
 	app.Authors = []cli.Author{
 		{

@@ -28,7 +28,10 @@ type Config struct {
 
 // Exec operation for this plugin
 func (p Plugin) Exec() error {
-	client := NewChromeWebstoreClient(p.ApplicationID, p.Authentication)
+	client, err := NewChromeWebstoreClient(p.ApplicationID, p.Authentication)
+	if err != nil {
+		return fmt.Errorf("unable to create a chrome webstore client: %v", err)
+	}
 
 	if p.Config.Upload {
 		buf, err := GenerateZipContent(p.Config.Source)
@@ -37,7 +40,7 @@ func (p Plugin) Exec() error {
 		}
 
 		if err := client.UploadNewVersion(buf); err != nil {
-			return fmt.Errorf("unable to upload a new versio: %v", err)
+			return fmt.Errorf("unable to upload a new version: %v", err)
 		}
 	}
 

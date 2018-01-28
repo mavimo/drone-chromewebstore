@@ -5,9 +5,9 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 
+	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 )
 
@@ -18,7 +18,7 @@ type ChromeWebstoreClient struct {
 }
 
 // NewChromeWebstoreClient generate a new client to interact with Chrome Webstore API
-func NewChromeWebstoreClient(applicationID string, auth Authentication) ChromeWebstoreClient {
+func NewChromeWebstoreClient(applicationID string, auth Authentication) (ChromeWebstoreClient, error) {
 	ctx := context.Background()
 	cfg := oauth2.Config{
 		ClientID:     auth.ClientID,
@@ -39,10 +39,10 @@ func NewChromeWebstoreClient(applicationID string, auth Authentication) ChromeWe
 
 	tkn, err := ts.Token()
 	if err != nil {
-		fmt.Println("unable to refresh token")
+		return ChromeWebstoreClient{}, fmt.Errorf("unable to refresh token: %v", err)
 	}
 
-	return ChromeWebstoreClient{cfg.Client(ctx, tkn), applicationID}
+	return ChromeWebstoreClient{cfg.Client(ctx, tkn), applicationID}, nil
 }
 
 // UploadNewVersion send a new version of application to Chrome Webstore
@@ -63,10 +63,10 @@ func (client ChromeWebstoreClient) UploadNewVersion(buf *bytes.Buffer) error {
 
 	message, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return fmt.Errorf("unable to get response when upload application %s: %v", client.ApplicationID, err)
+		return fmt.Errorf("unable to get response when upload application: %v", err)
 	}
 
-	log.Printf(string(message))
+	logrus.Infoln(string(message))
 
 	return nil
 }
@@ -81,16 +81,16 @@ func (client ChromeWebstoreClient) GetInfo() error {
 
 	res, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("unable to fetch infos for application %s: %v", client.ApplicationID, err)
+		return fmt.Errorf("unable to fetch infos for application: %v", err)
 	}
 	defer res.Body.Close()
 
 	message, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return fmt.Errorf("unable to get response when get info for application %s: %v", client.ApplicationID, err)
+		return fmt.Errorf("unable to get response when get info for application: %v", err)
 	}
 
-	log.Printf(string(message))
+	logrus.Infoln(string(message))
 
 	return nil
 }
@@ -110,16 +110,16 @@ func (client ChromeWebstoreClient) PublishVersion(target string) error {
 
 	res, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("unable to publish application %s: %v", client.ApplicationID, err)
+		return fmt.Errorf("unable to publish application: %v", err)
 	}
 	defer res.Body.Close()
 
 	message, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return fmt.Errorf("unable to get response when publish application %s: %v", client.ApplicationID, err)
+		return fmt.Errorf("unable to get response when publish application: %v", err)
 	}
 
-	log.Printf(string(message))
+	logrus.Infoln(string(message))
 
 	return nil
 }
