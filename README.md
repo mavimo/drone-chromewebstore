@@ -157,3 +157,7 @@ pipeline:
     when:
       event: push
 ```
+
+## Special Thanks
+ - [Bo-Yi Wu](https://github.com/appleboy) for create the drone plugin scaffolding I used for this project (see: [`drone-lambda`](https://github.com/appleboy/drone-lambda))
+ - [Brad Rydzewski](https://github.com/bradrydzewski) for create (and open source) the [`drone`](https://github.com/drone/drone) project
