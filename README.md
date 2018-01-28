@@ -48,6 +48,112 @@ docker: Error response from daemon: Container command
 '/drone-chromewebstore' not found or does not exist..
 ```
 
+## How to get required parameters
+
+In order to use Chrome Webstore API you should create an account that is autorized, the process is a bit tricky, let see step by step what we need to do.
+
+1. Create a new application on Chorme Webstore
+    - Go to (webstore developer dashboard](https://chrome.google.com/webstore/developer/dashboard) (need you're registered as developer in order to publish application to all users)
+    - Create a new application (button *Add new item*) and fill form with required information, the first time shoul should upload the first version of your application.
+    - Save an copy the application ID (you can see it on URL, eg: on URL `https://chrome.google.com/webstore/developer/edit/hcolchlidglfiofiefppcdnkpbgphkgb?authuser=0` the `hcolchlidglfiofiefppcdnkpbgphkgb` part is the Application ID
+2. Create a new authorization, you should follow steps reported in [Using the Chrome Web Store Publish API
+](https://developer.chrome.com/webstore/using_webstore_api) guide, o summarize:
+    - Visit [https://console.developers.google.com/](https://console.developers.google.com/)
+    - Create a new project
+    - Enable *Chrome Webstore API* for this project
+    - Create auhentication credentials
+    - Save your *Client ID* and *Client Secret*
+    - Generate your *Refresh Token* and save it
+
 ## Usage
 
-TBD
+### Options available
+
+ - flag `--env-file`: `.env` file to load (useful for debugging)
+ - env variable `$PLUGIN_APPLICATION` or flag `--application`: the application ID 
+ - env variable `$PLUGIN_CLIENT_ID` or flag `--client-id`: Client ID
+ - env variable `$PLUGIN_CLIENT_SECRET` or flag `--client-secret`: Client secret
+ - env variable `$PLUGIN_REFRESH_TOKEN` or flag `--refresh-token`: Refresh token
+ - env variable `$PLUGIN_SOURCE` or flag `--source`: Application source folder 
+ - env variable `$PLUGIN_UPLOAD` or flag `--upload`: indicate if we should upload application to webstore (`true` by default)
+ - env variable `$PLUGIN_PUBLISH` or flag `--publish`: indicate if we should publish application in webstore (`true` by default)
+ - env variable `$PLUGIN_PUBLISH_TARGET` or flag `--publish-target`: Publish target, should be `default` or `trustedTesters` (`default` by default)
+
+### Configure drone
+
+Configure your drone instance to automatically upload / deploy your application. The configuration need some env variables that tipically are set in secrets section.
+
+Your configuration should looks like:
+
+```yaml
+pipeline:
+  # Previous steps
+
+  upload-extension:
+    image: mavimo/drone-chromewebstore
+    secrets: [plugin_application, plugin_client_id, plugin_client_secret, plugin_refresh_token]
+    source: ./src
+    upload: true
+    publish: false
+    when:
+      event: [push]
+      branch: [master]
+
+  deploy-extension:
+    image: mavimo/drone-chromewebstore
+    secrets: [plugin_application, plugin_client_id, plugin_client_secret, plugin_refresh_token]
+    upload: false
+    publish: true
+    publish_target: trustedTesters
+    when:
+      event: deployment
+      environment: staging
+
+  deploy-extension:
+    image: mavimo/drone-chromewebstore
+    secrets: [plugin_application, plugin_client_id, plugin_client_secret, plugin_refresh_token]
+    upload: false
+    publish: true
+    publish_target: default
+    when:
+      event: deployment
+      environment: production
+
+  # Next steps
+```
+
+Where the `upload-extension` step publish the application using the information configured on drone secrets:
+
+ - `plugin_application`: contains the application ID
+ - `plugin_client_id`: contains the client ID
+ - `plugin_client_secret`: contains the client secret
+ - `plugin_refresh_token`: contains the refresh token generated before
+
+The `source` parameter indicate the root folder of your application (should contains the `manifest.json` file)
+
+The `upload` parameter indicate that we are going to zip and upload a new application version. NB: `manifest.json` should contains a version number bigger than already published version.
+
+The `publish` parameter indicate that we are going to publish uploaded application. By default it publish to `default` group, but you should publish also to `trustedTesters`, for example when deploy on staging env.
+
+## Tips
+
+Since is not possible publish the same version on webstore we should increase it each time, we should use the drone build ID. 
+Edit `manifest.json` file
+
+```json
+{
+    // ...
+    "version": "1.0.3.BUILD_NUMBER",
+    // ...
+}
+```
+and add to `.drone.yml` as step before upload (tune manifest path and `when` conditions):
+```yaml
+pipeline:
+  prepare:
+    image: alpine
+    commands:
+      - sed -i "s/BUILD_NUMBER/$DRONE_BUILD_NUMBER/g" src/manifest.json
+    when:
+      event: push
+```
